@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Konverter Kepemilikan Saham OJK</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f0f0;min-height:100vh;padding:24px;color:#1a1a1a}
+.app{max-width:920px;margin:0 auto}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.brand{display:flex;align-items:center;gap:10px}
+.dot{width:9px;height:9px;border-radius:50%;background:#E24B4A}
+.bname{font-size:17px;font-weight:700}
+.bsub{font-size:12px;color:#777}
+.ojk{font-size:11px;padding:4px 12px;border-radius:20px;background:#FCEBEB;color:#A32D2D;font-weight:700;border:1px solid #F7C1C1}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.stat{background:white;border-radius:10px;padding:14px 16px;border:1px solid #e5e5e5}
+.sl{font-size:11px;color:#999;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+.sv{font-size:22px;font-weight:700}
+.sv.g{color:#27500A}
+.sv.sm{font-size:13px;line-height:1.5;padding-top:2px;font-weight:600}
+.card{background:white;border:1px solid #e5e5e5;border-radius:12px;padding:16px 18px;margin-bottom:12px}
+.ct{font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.dz{border:2px dashed #ddd;border-radius:8px;padding:20px 16px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:#fafafa}
+.dz:hover,.dz.ov{border-color:#E24B4A;background:#fff5f5}
+.dz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.dz-ico{width:36px;height:36px;margin:0 auto 10px;border-radius:8px;background:#FCEBEB;display:flex;align-items:center;justify-content:center}
+.dz-t{font-size:13px;font-weight:600;margin-bottom:3px}
+.dz-s{font-size:11px;color:#999}
+.chip{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#f5f5f5;border-radius:8px;margin-top:7px;font-size:12px;border:1px solid #eee}
+.chip-ico{width:26px;height:26px;border-radius:5px;background:#FCEBEB;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#A32D2D;flex-shrink:0}
+.chip-nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.chip-sz{color:#aaa;font-size:11px}
+.chip-rm{cursor:pointer;color:#bbb;padding:2px 6px;border-radius:4px;font-size:14px}
+.chip-rm:hover{color:#E24B4A}
+.xz{border:2px dashed #ddd;border-radius:8px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:#fafafa}
+.xz:hover{border-color:#639922}
+.xz.ok{border-color:#639922;background:#f0f9e8}
+.xz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.xz-l{font-size:12px;color:#aaa}
+.xz-l.ok{color:#27500A;font-weight:600}
+.col-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.col-tag{font-size:10px;padding:2px 8px;border-radius:10px;background:#f0f0f0;color:#777;border:1px solid #e5e5e5}
+.act{display:flex;gap:8px;margin-bottom:10px}
+.btn-go{flex:1;padding:12px;background:#E24B4A;color:white;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s}
+.btn-go:hover{background:#A32D2D}
+.btn-go:disabled{background:#ccc;cursor:not-allowed}
+.btn-dl{padding:12px 18px;background:#EAF3DE;border:1.5px solid #C0DD97;border-radius:8px;font-size:13px;color:#27500A;font-weight:700;cursor:pointer;display:none}
+.btn-dl.on{display:block}
+.btn-dl:hover{background:#C0DD97}
+.prog{height:5px;background:#eee;border-radius:5px;overflow:hidden;margin-bottom:10px}
+.prog-f{height:100%;background:#E24B4A;border-radius:5px;width:0;transition:width .3s}
+.logbox{background:#fafafa;border:1px solid #eee;border-radius:8px;padding:10px 12px;font-size:11px;font-family:'Courier New',monospace;max-height:120px;overflow-y:auto;line-height:1.9}
+.ll{display:flex;gap:8px}
+.lt{flex-shrink:0;font-weight:700}
+.lt.ok{color:#0F6E56}.lt.info{color:#185FA5}.lt.err{color:#E24B4A}.lt.warn{color:#BA7517}
+.lm{color:#555}
+.prev-wrap{overflow-x:auto;margin-top:12px}
+.prev-lbl{font-size:11px;color:#999;margin-bottom:6px}
+.ptbl{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed}
+.ptbl th{background:#f5f5f5;color:#888;padding:6px 8px;text-align:left;border-bottom:1px solid #eee;font-weight:700;font-size:10px;text-transform:uppercase;white-space:nowrap}
+.ptbl td{padding:6px 8px;border-bottom:1px solid #f5f5f5;background:#EAF3DE;color:#27500A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ptbl td:first-child{border-left:3px solid #639922}
+.hist-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f5}
+.hist-item:last-child{border-bottom:none}
+.hi-dot{width:7px;height:7px;border-radius:50%;background:#639922;flex-shrink:0}
+.hi-nm{flex:1;font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hi-mt{font-size:11px;color:#aaa}
+.hi-r{font-size:11px;color:#27500A;font-weight:700}
+.info-box{background:#E6F1FB;border:1px solid #B5D4F4;border-radius:8px;padding:10px 14px;font-size:12px;color:#0C447C;margin-bottom:16px;line-height:1.6}
+.info-box strong{font-weight:700}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">
+      <div class="dot"></div>
+      <span class="bname">Konverter Kepemilikan Saham</span>
+      <span class="bsub">OJK POJK 4/2024</span>
+    </div>
+    <span class="ojk">IDX Data Tool</span>
+  </div>
+
+  <div class="info-box">
+    <strong>Cara pakai:</strong> Upload PDF laporan kepemilikan saham OJK → (opsional) upload template .xlsx Anda → klik Konversi → unduh hasil Excel. API key sudah terkonfigurasi di server.
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="sl">PDF diproses</div><div class="sv" id="sc">0</div></div>
+    <div class="stat"><div class="sl">Baris ditambahkan</div><div class="sv g" id="sr">0</div></div>
+    <div class="stat"><div class="sl">Emiten</div><div class="sv sm" id="se">—</div></div>
+    <div class="stat"><div class="sl">Terakhir proses</div><div class="sv sm" id="sl2">—</div></div>
+  </div>
+
+  <div class="panels">
+    <div class="card" style="margin-bottom:0">
+      <div class="ct">1 — Upload PDF Laporan OJK</div>
+      <div class="dz" id="pdfZone">
+        <input type="file" id="pdfIn" accept=".pdf" multiple onchange="addPdfs(this.files)">
+        <div class="dz-ico">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E24B4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        </div>
+        <div class="dz-t">Seret PDF di sini</div>
+        <div class="dz-s">Laporan OJK POJK 4/2024 · Multi-file</div>
+      </div>
+      <div id="pdfList"></div>
+    </div>
+
+    <div class="card" style="margin-bottom:0">
+      <div class="ct">2 — Template Excel (opsional)</div>
+      <div class="xz" id="xlsxZone">
+        <input type="file" id="xlsxIn" accept=".xlsx" onchange="loadXlsx(this.files[0])">
+        <div class="xz-l" id="xlsxLbl">Klik atau seret file .xlsx template Anda</div>
+      </div>
+      <div style="font-size:11px;color:#aaa;margin-top:8px">Jika tidak diupload, workbook baru akan dibuat.</div>
+      <div style="margin-top:12px">
+        <div class="ct">Kolom output</div>
+        <div class="col-tags" id="colTags"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <div class="ct">3 — Proses & Unduh</div>
+    <div class="act">
+      <button class="btn-go" id="goBtn" onclick="runConvert()" disabled>Konversi ke Excel</button>
+      <button class="btn-dl" id="dlBtn">Unduh .xlsx</button>
+    </div>
+    <div class="prog"><div class="prog-f" id="progF"></div></div>
+    <div class="logbox" id="logBox"></div>
+    <div class="prev-wrap" id="prevWrap" style="display:none">
+      <div class="prev-lbl" id="prevLbl"></div>
+      <table class="ptbl" id="prevTbl"></table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ct" style="margin-bottom:10px">Riwayat sesi</div>
+    <div id="histList"><div style="font-size:12px;color:#bbb;text-align:center;padding:8px 0">Belum ada file diproses</div></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const COLS=['saham','date','broker','big player','jumlah sebelum','change','jumlah sesudah','harga','jabatan'];
+const CW=[8,12,12,26,16,14,16,8,14];
+let pdfs=[],xlsxFile=null,xlsxBlob=null,hist=[],sConv=0,sRows=0,sEmit=new Set();
+
+document.getElementById('colTags').innerHTML=COLS.map(c=>`<span class="col-tag">${c}</span>`).join('');
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+const pdfZone=document.getElementById('pdfZone');
+pdfZone.addEventListener('dragover',e=>{e.preventDefault();pdfZone.classList.add('ov')});
+pdfZone.addEventListener('dragleave',()=>pdfZone.classList.remove('ov'));
+pdfZone.addEventListener('drop',e=>{e.preventDefault();pdfZone.classList.remove('ov');addPdfs(e.dataTransfer.files)});
+document.getElementById('xlsxZone').addEventListener('dragover',e=>e.preventDefault());
+document.getElementById('xlsxZone').addEventListener('drop',e=>{e.preventDefault();if(e.dataTransfer.files[0])loadXlsx(e.dataTransfer.files[0])});
+
+function addPdfs(files){
+  const names=new Set(pdfs.map(f=>f.name));
+  Array.from(files).filter(f=>f.name.endsWith('.pdf')&&!names.has(f.name)).forEach(f=>pdfs.push(f));
+  renderPdfs();
+}
+function renderPdfs(){
+  document.getElementById('pdfList').innerHTML=pdfs.map((f,i)=>`<div class="chip">
+    <div class="chip-ico">PDF</div>
+    <span class="chip-nm">${f.name}</span>
+    <span class="chip-sz">${f.size>1048576?(f.size/1048576).toFixed(1)+' MB':(f.size/1024).toFixed(0)+' KB'}</span>
+    <span class="chip-rm" onclick="rmPdf(${i})">✕</span>
+  </div>`).join('');
+  document.getElementById('goBtn').disabled=pdfs.length===0;
+}
+function rmPdf(i){pdfs.splice(i,1);renderPdfs()}
+function loadXlsx(f){
+  xlsxFile=f;
+  document.getElementById('xlsxZone').classList.add('ok');
+  const l=document.getElementById('xlsxLbl');l.textContent=f.name;l.className='xz-l ok';
+  log('Template dimuat: '+f.name,'ok');
+}
+
+const lb=document.getElementById('logBox');
+function log(m,t='info'){
+  lb.innerHTML+=`<div class="ll"><span class="lt ${t}">[${t.toUpperCase().slice(0,3)}]</span><span class="lm">${m}</span></div>`;
+  lb.scrollTop=lb.scrollHeight;
+}
+function setP(v){document.getElementById('progF').style.width=Math.min(100,v)+'%'}
+
+async function extractPdfText(file){
+  const ab=await file.arrayBuffer();
+  const pdf=await pdfjsLib.getDocument({data:ab}).promise;
+  let out='';
+  for(let i=1;i<=pdf.numPages;i++){
+    const pg=await pdf.getPage(i);
+    const ct=await pg.getTextContent();
+    const lines={};
+    ct.items.forEach(it=>{
+      const y=Math.round(it.transform[5]);
+      if(!lines[y])lines[y]=[];
+      lines[y].push({x:it.transform[4],t:it.str});
+    });
+    Object.keys(lines).map(Number).sort((a,b)=>b-a).forEach(y=>{
+      out+=lines[y].sort((a,b)=>a.x-b.x).map(r=>r.t).join(' ')+'\n';
+    });
+  }
+  return out;
+}
+
+async function callAI(text){
+  const r=await fetch('/api/convert',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({text})
+  });
+  const d=await r.json();
+  if(d.error)throw new Error(d.error);
+  return d;
+}
+
+function buildRows(p){
+  let before=p.jumlah_sebelum_total||0;
+  return p.transaksi.map(tx=>{
+    const ch=tx.jumlah_unit||0;
+    const after=tx.jenis==='Penjualan'?before-ch:before+ch;
+    const row={saham:p.kode_saham,date:tx.tanggal,broker:tx.jenis,big_player:p.big_player,
+      jumlah_sebelum:before,change:ch,jumlah_sesudah:after,harga:tx.harga,jabatan:p.jabatan||''};
+    before=after;return row;
+  });
+}
+
+function toDate(s){const[d,m,y]=s.split('/').map(Number);return new Date(y,m-1,d)}
+function fmt(n){return typeof n==='number'?n.toLocaleString('id-ID'):n}
+
+async function runConvert(){
+  if(!pdfs.length)return;
+  document.getElementById('goBtn').disabled=true;
+  document.getElementById('dlBtn').classList.remove('on');
+  document.getElementById('prevWrap').style.display='none';
+  lb.innerHTML='';setP(0);xlsxBlob=null;
+  let wb,ws,startRow;
+  try{
+    if(xlsxFile){
+      log('Memuat template: '+xlsxFile.name,'info');
+      const ab=await xlsxFile.arrayBuffer();
+      wb=XLSX.read(ab,{type:'array',cellDates:true});
+      ws=wb.Sheets[wb.SheetNames[0]];
+      const ref=XLSX.utils.decode_range(ws['!ref']||'A1');
+      startRow=ref.e.r+2;
+      log('Template OK — '+ref.e.r+' baris sudah ada','ok');
+    }else{
+      wb=XLSX.utils.book_new();ws={};
+      XLSX.utils.book_append_sheet(wb,ws,'Sheet1');
+      COLS.forEach((c,i)=>{ws[XLSX.utils.encode_cell({r:0,c:i})]={v:c,t:'s'}});
+      startRow=1;log('Membuat workbook baru','info');
+    }
+    const allRows=[];
+    for(let fi=0;fi<pdfs.length;fi++){
+      const f=pdfs[fi];
+      log('Memproses: '+f.name,'info');setP(10+fi*(70/pdfs.length));
+      let text;
+      try{text=await extractPdfText(f);}catch(e){log('Gagal baca PDF: '+e.message,'err');continue;}
+      log('Teks diekstrak ('+text.length+' karakter) — mengirim ke AI...','info');setP(30+fi*(50/pdfs.length));
+      let parsed;
+      try{parsed=await callAI(text);}catch(e){log('Gagal ekstrak AI: '+e.message,'err');continue;}
+      log('OK: '+parsed.kode_saham+' — '+parsed.big_player+' — '+parsed.transaksi.length+' transaksi','ok');
+      const rows=buildRows(parsed);allRows.push(...rows);sEmit.add(parsed.kode_saham);
+      const t=new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+      hist.unshift({name:f.name,emiten:parsed.kode_saham,player:parsed.big_player,rows:rows.length,time:t});
+    }
+    if(!allRows.length){log('Tidak ada data berhasil diekstrak','err');document.getElementById('goBtn').disabled=false;return;}
+    log('Menulis '+allRows.length+' baris ke Excel...','info');setP(90);
+    allRows.forEach((row,ri)=>{
+      const r=startRow+ri;
+      const vals=[row.saham,toDate(row.date),row.broker,row.big_player,row.jumlah_sebelum,row.change,row.jumlah_sesudah,row.harga,row.jabatan];
+      vals.forEach((v,ci)=>{
+        const a=XLSX.utils.encode_cell({r,c:ci});
+        if(v instanceof Date)ws[a]={v,t:'d',z:'DD/MM/YYYY'};
+        else if(typeof v==='number')ws[a]={v,t:'n'};
+        else ws[a]={v:String(v),t:'s'};
+      });
+    });
+    const ref=ws['!ref']?XLSX.utils.decode_range(ws['!ref']):{s:{r:0,c:0},e:{r:0,c:8}};
+    ref.e.r=Math.max(ref.e.r,startRow+allRows.length-1);ref.e.c=Math.max(ref.e.c,8);
+    ws['!ref']=XLSX.utils.encode_range(ref);ws['!cols']=CW.map(w=>({wch:w}));
+    const out=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+    xlsxBlob=new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    const fname=(xlsxFile?xlsxFile.name.replace('.xlsx',''):'data_kepemilikan')+'_updated.xlsx';
+    sConv+=pdfs.length;sRows+=allRows.length;
+    document.getElementById('sc').textContent=sConv;
+    document.getElementById('sr').textContent=sRows;
+    document.getElementById('se').textContent=[...sEmit].join(', ')||'—';
+    document.getElementById('sl2').textContent=new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+    renderHist();renderPrev(allRows);setP(100);
+    log('Selesai! '+allRows.length+' baris berhasil ditambahkan','ok');
+    const dl=document.getElementById('dlBtn');
+    dl.textContent='Unduh '+fname;dl.classList.add('on');
+    dl.onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(xlsxBlob);a.download=fname;a.click()};
+    pdfs=[];renderPdfs();
+  }catch(err){log('Error: '+err.message,'err');}
+  document.getElementById('goBtn').disabled=pdfs.length===0;
+}
+
+function renderPrev(rows){
+  document.getElementById('prevLbl').textContent='Preview — '+rows.length+' baris baru';
+  let h=`<tr>${COLS.map(c=>`<th>${c}</th>`).join('')}</tr>`;
+  rows.slice(0,6).forEach(row=>{
+    const v=[row.saham,row.date,row.broker,row.big_player,fmt(row.jumlah_sebelum),fmt(row.change),fmt(row.jumlah_sesudah),row.harga,row.jabatan];
+    h+=`<tr>${v.map(x=>`<td>${x}</td>`).join('')}</tr>`;
+  });
+  if(rows.length>6)h+=`<tr><td colspan="9" style="padding:4px 8px;color:#aaa;font-size:10px">... dan ${rows.length-6} baris lainnya</td></tr>`;
+  document.getElementById('prevTbl').innerHTML=h;
+  document.getElementById('prevWrap').style.display='block';
+}
+
+function renderHist(){
+  const d=document.getElementById('histList');
+  if(!hist.length){d.innerHTML='<div style="font-size:12px;color:#bbb;text-align:center;padding:8px 0">Belum ada file diproses</div>';return;}
+  d.innerHTML=hist.slice(0,8).map(h=>`<div class="hist-item">
+    <div class="hi-dot"></div>
+    <span class="hi-nm">${h.emiten} — ${h.player}</span>
+    <span class="hi-mt">${h.name.length>22?h.name.slice(0,22)+'...':h.name} · ${h.time}</span>
+    <span class="hi-r">+${h.rows}</span>
+  </div>`).join('');
+}
+
+log('Dashboard siap. Upload PDF laporan OJK untuk memulai.','ok');
+</script>
+</body>
+</html>
