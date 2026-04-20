@@ -231,7 +231,7 @@ function buildRows(p){
   });
 }
 
-function toDate(s){const[d,m,y]=s.split('/').map(Number);return d+'/'+m+'/'+y;}
+function toDate(s){const[d,m,y]=s.split('/').map(Number);return m+'/'+d+'/'+y;}
 function fmt(n){return typeof n==='number'?n.toLocaleString('id-ID'):n}
 
 async function runConvert(){
@@ -277,7 +277,7 @@ async function runConvert(){
       const vals=[row.saham,toDate(row.date),row.broker,row.big_player,row.jumlah_sebelum,row.change,row.jumlah_sesudah,row.harga,row.jabatan];
       vals.forEach((v,ci)=>{
         const a=XLSX.utils.encode_cell({r,c:ci});
-        if(typeof v==='string'&&v.match(/^\d+\/\d+\/\d{4}$/))ws[a]={v,t:'s',z:'@'};
+        if(typeof v==='string'&&v.match(/^\d+\/\d+\/\d{4}$/)){ws[a]={v,t:'s'};continue;}
         else if(typeof v==='number')ws[a]={v,t:'n'};
         else ws[a]={v:String(v),t:'s'};
       });
