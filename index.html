@@ -231,7 +231,7 @@ function buildRows(p){
   });
 }
 
-function toDate(s){const[d,m,y]=s.split('/').map(Number);return (m<10?'0'+m:m)+'/'+(d<10?'0'+d:d)+'/'+y;}
+function toDate(s){const[d,m,y]=s.split('/').map(Number);return m+'/'+d+'/'+y;}
 function fmt(n){return typeof n==='number'?n.toLocaleString('id-ID'):n}
 
 async function runConvert(){
