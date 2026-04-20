@@ -278,7 +278,7 @@ async function runConvert(){
       vals.forEach((v,ci)=>{
         const a=XLSX.utils.encode_cell({r,c:ci});
         if(typeof v==='string'&&v.match(/^\d+\/\d+\/\d{4}$/)){ws[a]={v,t:'s'};}
-        else if(typeof v==='number')ws[a]={v,t:'n'};
+        else if(v instanceof Date)ws[a]={v,t:'s',v:String(v)};
         else ws[a]={v:String(v),t:'s'};
       });
     });
