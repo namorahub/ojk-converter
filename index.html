@@ -231,7 +231,14 @@ function buildRows(p){
   });
 }
 
-function toDate(s){const[d,m,y]=s.split('/').map(Number);return m+'/'+d+'/'+y;}
+/** API mengembalikan tanggal MM/DD/YYYY; Excel: string M/D/YYYY (tanpa nol depan), konsisten dengan preview. */
+function formatDateForExcel(s){
+  if(typeof s!=='string'||!/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s.trim()))return s;
+  const p=s.trim().split('/').map(Number);
+  if(p.length!==3||p.some(x=>Number.isNaN(x)))return s;
+  const [month,day,year]=p;
+  return month+'/'+day+'/'+year;
+}
 function fmt(n){return typeof n==='number'?n.toLocaleString('id-ID'):n}
 
 async function runConvert(){
@@ -274,7 +281,7 @@ async function runConvert(){
     log('Menulis '+allRows.length+' baris ke Excel...','info');setP(90);
     allRows.forEach((row,ri)=>{
       const r=startRow+ri;
-      const vals=[row.saham,toDate(row.date),row.broker,row.big_player,row.jumlah_sebelum,row.change,row.jumlah_sesudah,row.harga,row.jabatan];
+      const vals=[row.saham,formatDateForExcel(row.date),row.broker,row.big_player,row.jumlah_sebelum,row.change,row.jumlah_sesudah,row.harga,row.jabatan];
       vals.forEach((v,ci)=>{
         const a=XLSX.utils.encode_cell({r,c:ci});
         if(typeof v==='string'&&v.match(/^\d+\/\d+\/\d{4}$/)){ws[a]={v,t:'s'};}
